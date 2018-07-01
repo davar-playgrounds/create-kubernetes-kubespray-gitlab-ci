@@ -40,7 +40,7 @@ kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --se
 ```sh
 kubectl get svc --all-namespaces -o go-template='{{range .items}}{{range.spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\n"}}{{end}}{{end}}{{end}}'
 ```
-## Go https://real-ip:$nodeport
+## Go https://real-ip-node:$nodeport
 
 ## Get token
 ```sh
