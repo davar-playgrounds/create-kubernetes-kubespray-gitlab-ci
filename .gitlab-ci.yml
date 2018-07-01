@@ -1,0 +1,43 @@
+# Prepare Nodes:
+# For every node:
+# ssh ip-node 'sudo useradd user_kuber'
+# ssh ip-node 'echo random-password | sudo passwd user_kuber  --stdin'
+# ssh ip-node 'sudo usermod -aG wheel user_kuber'
+# ssh ip-node 'sudo sed -i "s/SELINUX=enforcing/SELINUX=disabled/" /etc/selinux/config'
+# ssh ip-node 'sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config'
+# ssh ip-node "echo 'user_kuber ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/user_kuber"
+# ssh ip-node 'sudo /usr/sbin/reboot'
+
+# Generating a new SSH key in repo after inport project
+# mkdir .ssh
+# ssh-keygen -f .ssh/id_rsa
+
+stages:
+  - deploy
+
+before_script:
+  - apt-get update
+  - apt-get install -y python-pip openssh-client sshpass git apache2-utils
+  - pip install ansible ansible-modules-hashivault kubespray
+  - chmod 0600 .ssh/id_rsa
+  - eval `ssh-agent`
+  - ssh-add .ssh/id_rsa
+  - sshpass -p random-password /usr/bin/ssh-copy-id -f -o StrictHostKeyChecking=no user_kuber@ip-node1
+  - sshpass -p random-password /usr/bin/ssh-copy-id -f -o StrictHostKeyChecking=no user_kuber@ip-node2
+  - sshpass -p random-password /usr/bin/ssh-copy-id -f -o StrictHostKeyChecking=no user_kuber@ip-node3
+  #- ssh user_kuber@ip-node1 'sudo usermod -aG docker user_kuber'
+  #- ssh user_kuber@ip-node2 'sudo usermod -aG docker user_kuber'
+  #- ssh user_kuber@ip-node3 'sudo usermod -aG docker user_kuber'
+
+deploy:
+  stage: deploy
+  script:
+    - echo ip-node1 node1 >> /etc/hosts
+    - echo ip-node2 node2 >> /etc/hosts
+    - echo ip-node3 node3 >> /etc/hosts
+    - mv .kubespray.yml /root
+    #- ssh user_kuber@ip-node1 'docker rm -f $(docker ps -a -q)'
+    #- ssh user_kuber@ip-node2 'docker rm -f $(docker ps -a -q)'
+    #- ssh user_kuber@ip-node3 'docker rm -f $(docker ps -a -q)'
+    - kubespray prepare --nodes node1 node2 node3 --etcds 3 --masters 2
+    - kubespray deploy --assumeyes --user user_kuber -i inventory/inventory.cfg --ansible-opts '-e docker_dns_servers_strict=false'

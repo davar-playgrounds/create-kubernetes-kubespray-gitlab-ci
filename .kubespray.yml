@@ -1,0 +1,3 @@
+kubespray_git_repo: "https://github.com/kubespray/kubespray.git"
+loglevel: "info"
+
