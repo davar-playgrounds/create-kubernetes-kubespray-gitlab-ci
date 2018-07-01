@@ -14,30 +14,36 @@ ssh ip-node 'sudo /usr/sbin/reboot'
 ```
 
 # Generating a new SSH key in repo after inport project
-```
+```sh
 mkdir .ssh
 ssh-keygen -f .ssh/id_rsa
 ```
 
 # Change ip-node1, ip-node2, ip-node3 to real ip of nodes in:
-- inventory/inventory.cfg
-- .gitlab-ci.yml
+  - inventory/inventory.cfg
+  - .gitlab-ci.yml
 
 # Prepare Kubernetes Cluster
 
-## change clusterip to nodeport command line without editor
+## Change clusterip to nodeport command line without editor
+```sh
 kubectl -n kube-system get service kubernetes-dashboard -o yaml > kube-dash-svc.yaml
 sed 's/ClusterIP/NodePort/' kube-dash-svc.yaml > new-kube-dash-svc.yaml
 kubectl delete svc kubectl delete svc kubernetes-dashboard --namespace kube-system --namespace kube-system
 kubectl create -f new-kube-dash-svc.yaml
-
+```
 ## Create admin
+```sh
 kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --serviceaccount=default:default
-
+```
 ## Get NodePort
-nodeport=$(kubectl get svc --all-namespaces -o go-template='{{range .items}}{{range.spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\n"}}{{end}}{{end}}{{end}}')
-echo $nodeport
-# Go https://real-ip:$nodeport
+```sh
+kubectl get svc --all-namespaces -o go-template='{{range .items}}{{range.spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\n"}}{{end}}{{end}}{{end}}'
+```
+## Go https://real-ip:$nodeport
 
 ## Get token
+```sh
 kubectl describe secret
+```
+
