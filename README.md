@@ -29,9 +29,14 @@ ssh-keygen -f .ssh/id_rsa
 ```sh
 kubectl -n kube-system get service kubernetes-dashboard -o yaml > kube-dash-svc.yaml
 sed 's/ClusterIP/NodePort/' kube-dash-svc.yaml > new-kube-dash-svc.yaml
-kubectl delete svc kubectl delete svc kubernetes-dashboard --namespace kube-system --namespace kube-system
+kubectl delete svc kubernetes-dashboard --namespace kube-system
 kubectl create -f new-kube-dash-svc.yaml
 ```
+or
+```sh
+kubectl patch svc kubernetes-dashboard --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
+```
+
 ## Create admin
 ```sh
 kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --serviceaccount=default:default
