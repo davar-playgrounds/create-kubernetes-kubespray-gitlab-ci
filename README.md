@@ -1,4 +1,4 @@
-# create-kubernetes-kubespray-gitlab-ci
+# Create kubernetes cluster using kubespray and gitlab ci
 Create kubernetes with kubespray and gitlab-ci
 
 # Prepare Nodes:
@@ -10,6 +10,9 @@ ssh ip-node 'sudo usermod -aG wheel user_kuber'
 ssh ip-node 'sudo sed -i "s/SELINUX=enforcing/SELINUX=disabled/" /etc/selinux/config'
 ssh ip-node 'sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config'
 ssh ip-node "echo 'user_kuber ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/user_kuber"
+ssh ip-node "curl -sSL https://get.docker.com/ | sh"
+ssh ip-node "curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-ci-multi-runner/script.rpm.sh | sudo bash"
+ssh ip-node "sudo yum install gitlab-ci-multi-runner"
 ssh ip-node 'sudo /usr/sbin/reboot'
 ```
 
