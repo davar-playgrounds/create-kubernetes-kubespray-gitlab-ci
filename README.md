@@ -23,6 +23,8 @@ ssh-keygen -f .ssh/id_rsa
 ```sh
 gitlab-ci-multi-runner register
 ```
+Please enter the default Docker image (e.g. ruby:2.1):
+ubuntu:18.04
 
 ## Change clusterip to nodeport command line without editor
 ```sh
